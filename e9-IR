@@ -1,0 +1,59 @@
+int irLeft = A0;
+int irRight = A1;
+#define RM1 5
+#define RM2 6
+#define LM1 8
+#define LM2 7
+void setup() {
+pinMode(irLeft, INPUT);
+
+pinMode(irRight, INPUT);
+pinMode(RM1, OUTPUT);
+pinMode(RM2, OUTPUT);
+pinMode(LM1, OUTPUT);
+pinMode(LM2, OUTPUT);
+}
+void moveForward() {
+digitalWrite(LM1, HIGH);
+digitalWrite(LM2, LOW);
+digitalWrite(RM1, HIGH);
+digitalWrite(RM2, LOW);
+}
+void turnLeft() {
+digitalWrite(LM1, LOW);
+digitalWrite(LM2, LOW);
+digitalWrite(RM1, HIGH);
+digitalWrite(RM2, LOW);
+}
+void turnRight() {
+digitalWrite(LM1, HIGH);
+digitalWrite(LM2, LOW);
+digitalWrite(RM1, LOW);
+digitalWrite(RM2, LOW);
+}
+void stopBuggy() {
+digitalWrite(LM1, LOW);
+digitalWrite(LM2, LOW);
+digitalWrite(RM1, LOW);
+digitalWrite(RM2, LOW);
+}
+
+void lineFollow() {
+int left = digitalRead(irLeft);
+int right = digitalRead(irRight);
+if (left == 1 && right == 1) {
+moveForward(); // On line
+}
+else if (left == 0 && right == 1) {
+turnRight(); // Line on left
+}
+else if (left == 1 && right == 0) {
+turnLeft(); // Line on right
+}
+else {
+stopBuggy(); // Line lost
+}
+}
+void loop() {
+lineFollow();
+}
