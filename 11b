@@ -1,0 +1,97 @@
+const int IN1=5;
+const int IN2=6;
+const int IN3=7;
+const int IN4=8;
+const int irPin=4;
+
+void setup(){
+	pinMode(IN1,OUTPUT);
+	pinMode(IN2,OUTPUT);
+	pinMode(IN3,OUTPUT);
+	pinMode(IN4,OUTPUT);
+	pinMode(irPin,INPUT);
+	Serial.begin(9600);
+	Stop();
+}
+
+void forward(){
+	digitalWrite(IN1,LOW);
+	digitalWrite(IN2,HIGH);
+	digitalWrite(IN3,HIGH);
+	digitalWrite(IN4,LOW);
+}
+
+void backward(){
+	digitalWrite(IN1,HIGH);
+	digitalWrite(IN2,LOW);
+	digitalWrite(IN3,LOW);
+	digitalWrite(IN4,HIGH);
+}
+
+void right(){
+	digitalWrite(IN1,LOW);
+	digitalWrite(IN2,LOW);
+	digitalWrite(IN3,LOW);
+	digitalWrite(IN4,HIGH);
+}
+
+void left(){
+	digitalWrite(IN1,HIGH);
+	digitalWrite(IN2,LOW);
+	digitalWrite(IN3,LOW);
+	digitalWrite(IN4,LOW);
+}
+
+void Stop(){
+	digitalWrite(IN1,LOW);
+	digitalWrite(IN2,LOW);
+	digitalWrite(IN3,LOW);
+	digitalWrite(IN4,LOW);
+}
+
+void loop(){
+	if(Serial.available()>0){
+		char s=Serial.read();
+		switch(s){
+			case 'B':
+			case 'b':
+				forward();
+				Serial.println("Forward");
+				break;
+			case 'F':
+			case 'f':
+				backward();
+				Serial.println("Backward");
+				break;
+			case 'S':
+			case 's':
+				Stop();
+				Serial.println("Stop");
+				break;
+			case 'L':
+			case 'l':
+				left();
+				Serial.println("Left");
+				break;
+			case 'R':
+			case 'r':
+				right();
+				Serial.println("Right");
+				break;
+			default:
+				Serial.print("Unknown command: ");
+				Serial.println(s);
+				break;
+		}
+	}
+	if(digitalRead(irPin)==HIGH){
+		unsigned long d=pulseIn(irPin,HIGH,30000UL);
+		if(d>500UL && d<1500UL){
+			Serial.println(d);
+			Serial.println("Gantry: Crossed");
+			Stop();
+			delay(1000);
+			forward();
+		}
+	}
+}
