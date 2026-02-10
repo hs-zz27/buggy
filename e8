@@ -1,0 +1,65 @@
+ void setup() {
+pinMode(5, OUTPUT); //right +ve
+pinMode(6, OUTPUT); // right -ve
+pinMode(7, OUTPUT); // left -ve
+pinMode(8, OUTPUT); // left +ve
+}
+void fwd(){
+digitalWrite(5, HIGH);
+digitalWrite(8, HIGH);
+digitalWrite(6, LOW);
+digitalWrite(7, LOW);
+}
+void bwd(){
+digitalWrite(5, LOW);
+digitalWrite(8, LOW);
+digitalWrite(6, HIGH);
+digitalWrite(7, HIGH);
+}
+void anticlockwise(){
+digitalWrite(5, HIGH);
+digitalWrite(8, LOW);
+digitalWrite(6, LOW);
+digitalWrite(7, LOW);
+}
+
+void clockwise(){
+digitalWrite(5, LOW);
+digitalWrite(8, HIGH);
+digitalWrite(6, LOW);
+digitalWrite(7, LOW);
+}
+void Right(){
+digitalWrite(5, LOW);
+digitalWrite(8, HIGH);
+digitalWrite(6, HIGH);
+digitalWrite(7, LOW);
+}
+void Left(){
+digitalWrite(5, HIGH);
+digitalWrite(8, LOW);
+digitalWrite(6, LOW);
+digitalWrite(7, HIGH);
+}
+void stopMotors() {
+digitalWrite(5, LOW);
+digitalWrite(6, LOW);
+digitalWrite(7, LOW);
+digitalWrite(8, LOW);
+}
+
+void loop() {
+fwd();
+delay(3000);
+Left();
+delay(1250);
+Right();
+delay(1500);
+bwd();
+delay(3000);
+clockwise();
+delay(1000);
+anticlockwise();
+delay(1000);
+stopMotors();
+}
