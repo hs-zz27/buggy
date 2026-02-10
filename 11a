@@ -1,0 +1,136 @@
+#include <NewPing.h>
+
+bool start = false;
+
+const int trigPin = 13;
+const int echoPin = 12;
+const int maxDistance = 20;
+
+NewPing sonar(trigPin, echoPin, maxDistance);
+
+int distanceCm;
+int prevGantry = 0;
+
+void setup()
+{
+    pinMode(5, OUTPUT);   // Right Tyre +ve
+    pinMode(6, OUTPUT);   // Right Tyre -ve
+    pinMode(7, OUTPUT);   // Left Tyre +ve
+    pinMode(8, OUTPUT);   // Left Tyre -ve
+
+    pinMode(A0, INPUT);
+    pinMode(A1, INPUT);
+    pinMode(A2, INPUT);   // Receiver
+
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+
+    Serial.begin(9600);
+}
+
+void Forward()
+{
+    digitalWrite(5, HIGH);
+    digitalWrite(6, LOW);
+    digitalWrite(7, LOW);
+    digitalWrite(8, HIGH);
+}
+
+void Backward()
+{
+    digitalWrite(5, LOW);
+    digitalWrite(6, HIGH);
+    digitalWrite(7, HIGH);
+    digitalWrite(8, LOW);
+}
+
+void Left()
+{
+    digitalWrite(5, HIGH);
+    digitalWrite(6, LOW);
+    digitalWrite(7, LOW);
+    digitalWrite(8, LOW);
+}
+
+void Right()
+{
+    digitalWrite(5, LOW);
+    digitalWrite(6, LOW);
+    digitalWrite(7, LOW);
+    digitalWrite(8, HIGH);
+}
+
+void Stop()
+{
+    digitalWrite(5, LOW);
+    digitalWrite(6, LOW);
+    digitalWrite(7, LOW);
+    digitalWrite(8, LOW);
+}
+
+void loop()
+{
+    if (Serial.available())
+    {
+        char a = Serial.read();
+        if (a == 'x')
+        {
+            start = true;
+        }
+    }
+
+    if (start)
+    {
+        int d0 = digitalRead(A0);
+        int d1 = digitalRead(A1);
+        int g  = pulseIn(A2, HIGH, 5000);
+
+        if (g > 500 && g < 1500 && prevGantry != 1)
+        {
+            Serial.println("gantry 1");
+            Stop();
+            delay(1000);
+            prevGantry = 1;
+        }
+        else if (g > 1500 && g < 2500 && prevGantry != 2)
+        {
+            Serial.println("gantry 2");
+            Stop();
+            delay(1000);
+            prevGantry = 2;
+        }
+        else if (g > 2500 && g < 3500 && prevGantry != 3)
+        {
+            Serial.println("gantry 3");
+            Stop();
+            delay(1000);
+            prevGantry = 3;
+        }
+
+        if (d0 == 0 && d1 == 0)
+        {
+            Forward();
+            delay(150);
+        }
+        else if (d0 == 0)
+        {
+            Left();
+        }
+        else if (d1 == 0)
+        {
+            Right();
+        }
+        else
+        {
+            Forward();
+        }
+
+        distanceCm = sonar.ping_cm();
+
+        if (distanceCm > 0 && distanceCm < 15)
+        {
+            Stop();
+            delay(500);
+        }
+    }
+}
