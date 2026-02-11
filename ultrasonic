@@ -1,0 +1,101 @@
+// IR Sensors
+#define IR_LEFT  A0
+#define IR_RIGHT A1
+
+// Motor Driver Pins
+#define LM1 8
+#define LM2 7
+#define RM1 5
+#define RM2 6
+
+// Ultrasonic Sensor
+#define TRIG 13
+#define ECHO 12
+
+void setup() {
+  pinMode(IR_LEFT, INPUT);
+  pinMode(IR_RIGHT, INPUT);
+
+  pinMode(LM1, OUTPUT);
+  pinMode(LM2, OUTPUT);
+  pinMode(RM1, OUTPUT);
+  pinMode(RM2, OUTPUT);
+
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+
+  Serial.begin(9600);
+  Serial.println("Line Follower with Obstacle Avoidance Started");
+}
+void moveForward() {
+  digitalWrite(LM1, HIGH);
+  digitalWrite(LM2, LOW);
+  digitalWrite(RM1, HIGH);
+  digitalWrite(RM2, LOW);
+}
+
+void turnLeft() {
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, LOW);
+  digitalWrite(RM1, HIGH);
+  digitalWrite(RM2, LOW);
+}
+
+void turnRight() {
+  digitalWrite(LM1, HIGH);
+  digitalWrite(LM2, LOW);
+  digitalWrite(RM1, LOW);
+  digitalWrite(RM2, LOW);
+}
+
+void stopBuggy() {
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, LOW);
+  digitalWrite(RM1, LOW);
+  digitalWrite(RM2, LOW);
+}
+
+long getDistance() {
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  long duration = pulseIn(ECHO, HIGH);
+  long distance = duration * 0.034 / 2;
+  return distance;
+}
+
+void lineFollow() {
+  int left = digitalRead(IR_LEFT);
+  int right = digitalRead(IR_RIGHT);
+
+  if (left == 1 && right == 1) {
+    moveForward();          // On line
+  }
+  else if (left == 0 && right == 1) {
+    turnRight();             // Line on left
+  }
+  else if (left == 1 && right == 0) {
+    turnLeft();            // Line on right
+  }
+  else {
+    stopBuggy();            // Line lost
+  }
+}
+void loop() {
+  long distance = getDistance();
+
+  Serial.print("Distance: ");
+  Serial.println(distance);
+
+  if (distance < 20) {      // Obstacle detected
+    Serial.println("Obstacle Detected - Stopping");
+    stopBuggy();
+    delay(2000);
+  }
+  else {
+    lineFollow();           // Normal line following
+  }
+}
